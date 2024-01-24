@@ -1,64 +1,30 @@
 import os
 
-turn = 'X'
-win = False
-spaces = 9
+def draw(b):
+    for i in range(6, -1, -3): print(' '.join(b[i:i+3]))
 
-def draw(board):
-    for i in range(6, -1, -3):
-        print(' ' + board[i] + '|' + board[i+1] + '|' + board[i+2])
-
-def takeinput(board, spaces, turn):
-    pos = -1
-    print(turn + "'s turn:")
-    while pos == -1:
+def take_input(b, t):
+    while True:
         try:
-            print("Pick position 1-9:")
-            pos = int(input())
-            if(pos < 1 or pos > 9):
-                pos = -1
-            elif board[pos - 1] != ' ':
-                pos = -1
-        except:
-            print("Enter a valid position")
-        spaces -= 1
-        board[pos - 1] = turn
-        if turn == 'X':
-            turn = 'O'
-        else:
-            turn = 'X'
-    return board, spaces, turn
+            p = int(input(f"{t}'s turn: Pick position 1-9: "))
+            if 1 <= p <= 9 and b[p-1] == ' ': return p
+        except (ValueError, IndexError): pass
+        print("Enter a valid position.")
 
-def checkwin(board):
+def check_win(b):
     for i in range(0, 3):
-        r = i * 3
-        if board[r] != ' ':
-            if board[r] == board[r+1] and board[r+1] == board[r+2]:
-                return board[r]
-    for i in range(0, 3):
-        if board[i] != ' ':
-            if board[i] == board[i+3] and board[i] == board[i+6]:
-                return board[i]
-    if board[0] != ' ':
-        if (board[0] == board[4] and board[4] == board[8]):
-            return board[0]
-    if board[2] != ' ':
-        if (board[2] == board[4] and board[4] == board[6]):
-            return board[2]
-    return 0
+        if b[i] == b[i+3] == b[i+6] != ' ' or b[i*3] == b[i*3+1] == b[i*3+2] != ' ': return b[i] if b[i] != ' ' else 0
+    return b[4] if b[0] == b[4] == b[8] != ' ' or b[2] == b[4] == b[6] != ' ' else 0
 
-board = [' ']*9
+b, t, s = [' ']*9, 'X', 9
 
-while not win and spaces:
-    draw(board)
-    board, spaces, turn = takeinput(board, spaces, turn)
-    win = checkwin(board)
-    os.system('cls')
-    draw(board)
+while s:
+    os.system('cls' if os.name == 'nt' else 'clear')
+    draw(b)
+    p = take_input(b, t)
+    b[p-1], s, t = t, s-1, 'O' if t == 'X' else 'X'
+    w = check_win(b)
+    if w or not s: break
 
-if not win and not spaces:
-    print("Draw")
-elif win:
-    print(f'{win} wins')
-
+print("Draw" if not w else f'{w} wins')
 input()
